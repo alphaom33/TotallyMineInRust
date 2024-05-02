@@ -1,0 +1,9 @@
+funcname(){}
+funcname():
+  # pass
+funcname = (){}
+
+funcname() = return
+funcname = ()->return
+100_0
+",cvnx"
