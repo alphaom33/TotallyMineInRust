@@ -105,13 +105,13 @@ pub fn get_next(code: &str) -> usize {
   } return code.len();
 }
 
-pub fn set_ST(code: String) {
+pub fn set_st(code: String) {
   unsafe {
     ST = code;
   }
 }
 
-pub fn ST_empty() -> bool {
+pub fn st_empty() -> bool {
   unsafe {
     return ST.is_empty();
   }

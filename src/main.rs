@@ -3,19 +3,17 @@ use std::fs::File;
 
 mod lexer;
 
-//static mut ST: String = String::new();
-
 fn main() {
   let path: &str = "code/main.dym";
   let code: &str = &read_file(path);
   lexer::evaluate(code);
-  //let mut st: &str = code;
+  // but the print statement stuff is just for testing
+  // like your advance function
 
-    lexer::set_ST(code.to_string());
-  
-    while !lexer::ST_empty() {
-      lexer::advance();
-    }
+  lexer::set_st(code.to_string());
+  while !lexer::st_empty() {
+    lexer::advance();
+  }
 }
 
 
