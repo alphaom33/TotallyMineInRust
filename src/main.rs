@@ -1,13 +1,17 @@
 use std::io::Read;
 use std::fs::File;
 
+use lexer::TokenTypes;
+
 mod lexer;
 mod runinifier;
+mod postProcessor;
 
 fn main() {
   let path: &str = "code/main.dym";
   let code: &str = &read_file(path);
-  lexer::lex(code);
+  let mut tokens: Vec<TokenTypes> = lexer::lex(code);
+
   // lexer::set_st(code.to_string());
   // while !lexer::st_empty() {
   //   runinifier::def_dynanite_proc(lexer::advance());
