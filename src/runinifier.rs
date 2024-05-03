@@ -1,10 +1,8 @@
-mod lexer;
+// use crate::lexer::advance;
 
-fn defDynaniteProc(token: &str) {
-  match token {
-
-
-    "#" => while (token != "\n") {token = lexer::advance();},
-    _ => println!("varname"),
+pub fn def_dynanite_proc(token: String) {
+  match token.as_str() {
+    // "#" => while token != "\n" {token = advance();},
+    _ => println!("{}", token.as_str()),
   }
 }

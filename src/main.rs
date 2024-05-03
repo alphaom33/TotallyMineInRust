@@ -2,18 +2,16 @@ use std::io::Read;
 use std::fs::File;
 
 mod lexer;
+mod runinifier;
 
 fn main() {
   let path: &str = "code/main.dym";
   let code: &str = &read_file(path);
-  lexer::evaluate(code);
-  // but the print statement stuff is just for testing
-  // like your advance function
-
-  lexer::set_st(code.to_string());
-  while !lexer::st_empty() {
-    lexer::advance();
-  }
+  lexer::lex(code);
+  // lexer::set_st(code.to_string());
+  // while !lexer::st_empty() {
+  //   runinifier::def_dynanite_proc(lexer::advance());
+  // }
 }
 
 
