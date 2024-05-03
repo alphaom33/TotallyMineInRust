@@ -1,9 +1,13 @@
-funcname(){}
-funcname():
-  # pass
-funcname = (){}
-
+funcname(argument):
+  print(argument)
+funcname = (){
+  funcname(arg){return `ee`}
+}
+b = a ?= 1 # equality
 funcname() = return
 funcname = ()->return
-100_0
-",cvnx"
+100_000.05iE-4
+0.01
+.01 43.
+
+", cva \"nx"

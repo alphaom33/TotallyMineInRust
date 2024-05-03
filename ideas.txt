@@ -1,0 +1,15 @@
+Code blocks:
+  A code block is defined as a group of statements executed together.
+  Like everything else, a code block can be used as an expression, and it evaluates to null.
+  A code block can be created with multiple statements on one line separated by semicolons, as well as braces and indentation.
+
+Multiline statements:
+  A multiline statement is a function definition, if, for, while, try, etc.
+  Parentheses are not needed on the variable/expression part following the keyword.
+  Multiline statement "heads" can follow others on the same line for easy nesting.
+  The following algorithm is used to recognize the code block part of a multiline statement:
+    On some multiline statements like "else", you can use a colon or not, and the next recognized statement or code block in the code is used.
+    If there is a keyword for another multiline statement following the expression, use that statement.
+    If the line ends after the expression, or if there is a colon following the expression, use the next recognized statement or code block.
+    Else if there is an opening brace after the expression, use that code block.
+    Else, throw an error.
