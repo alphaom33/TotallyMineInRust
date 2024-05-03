@@ -111,18 +111,25 @@ pub fn set_st(code: String) {
   }
 }
 
+pub fn get_st() -> &'static str {
+  unsafe {
+    return ST.as_str();
+  }
+}
+
 pub fn st_empty() -> bool {
   unsafe {
     return ST.is_empty();
   }
 }
 
-pub fn advance() {
+pub fn advance() -> String {
   unsafe {
     let ind: usize = get_next(ST.as_str());
     let token: &str = &ST[..ind];
 
     println!("{}", token);
     ST = ST[ind..].to_string();
+    return token.to_string();
   }
 }
