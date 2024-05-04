@@ -1,17 +1,18 @@
 use std::io::Read;
 use std::fs::File;
 
-use lexer::TokenTypes;
-use postProcessor::post_process;
+use lexer::TokenType;
+use post_processor::post_process;
 
 mod lexer;
 mod runinifier;
-mod postProcessor;
+mod post_processor;
+mod tests;
 
 fn main() {
   let path: &str = "code/main.dym";
   let code: &str = &read_file(path);
-  let mut tokens: Vec<TokenTypes> = lexer::lex(code);
+  let mut tokens: Vec<TokenType> = lexer::lex(code);
   for token in &tokens {
     // println!("{}", token);
   }
@@ -27,8 +28,7 @@ fn main() {
   // }
 }
 
-
-fn read_file(path: &str) -> String {
+pub fn read_file(path: &str) -> String {
   let mut yes: File = File::open(path).expect("REASON");
   let mut contents = String::new();
   let _ = yes.read_to_string(&mut contents);
