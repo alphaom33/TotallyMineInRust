@@ -24,6 +24,7 @@ pub enum TokenTypes {
     LessThan,
     LessThanOrEqualTo,
     LineFeed,
+    Lambda
 }
 
 impl fmt::Display for TokenTypes {
@@ -39,13 +40,19 @@ pub fn lex(code: &str) -> Vec<TokenTypes> {
   let mut code_iter = code.chars().into_iter().peekable();
     while let Some(c) = code_iter.next() {
         tokens.push(match c {
-            '(' => TokenTypes::RightParenthesis,
-            ')' => TokenTypes::LeftParenthesis,
+            '(' => TokenTypes::LeftParenthesis,
+            ')' => TokenTypes::RightParenthesis,
             '{' => TokenTypes::LeftCurlyBracket,
             '}' => TokenTypes::RightCurlyBracket,
             '[' => TokenTypes::LeftBracket,
             ']' => TokenTypes::RightBracket,
-            '=' => TokenTypes::Set,
+            '=' => match code_iter.peek().unwrap() {
+              '>' => {
+                code_iter.next();
+                TokenTypes::Lambda
+              },
+              _ => TokenTypes::Set,
+            },
             '?' => {
                 code_iter.next();
                 TokenTypes::Equals
@@ -73,7 +80,7 @@ pub fn lex(code: &str) -> Vec<TokenTypes> {
                 continue;
             }
             '\n' => TokenTypes::LineFeed,
-            ' ' => continue,
+            ' ' | '\r' => continue,
             ',' => TokenTypes::Comma,
             '"' | '\'' => {
                 let mut accumulator: String = code_iter.peek().unwrap().to_string();
@@ -90,18 +97,16 @@ pub fn lex(code: &str) -> Vec<TokenTypes> {
             _ if c.to_digit(10).is_some() => TokenTypes::Number(c.to_string()),
             _ => {
                 let mut accumulator: String = c.to_string();
-                let mut namey: char = code_iter.next().unwrap();
                 while ![
                     '=', '?', '!', '>', '<', ',', '(', ')', '{', '}', '[', ']', ' ', '\n',
                 ]
-                .contains(&namey)
+                .contains(code_iter.peek().unwrap())
                 {
-                    accumulator += &namey.to_string();
+                    accumulator += &code_iter.peek().unwrap().to_string();
                     if code_iter.peek().is_none() {
                         break;
                     }
-
-                    namey = code_iter.next().unwrap();
+                    code_iter.next();
                 }
                 TokenTypes::Name(accumulator)
             }

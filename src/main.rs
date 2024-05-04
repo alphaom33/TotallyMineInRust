@@ -2,6 +2,7 @@ use std::io::Read;
 use std::fs::File;
 
 use lexer::TokenTypes;
+use postProcessor::post_process;
 
 mod lexer;
 mod runinifier;
@@ -11,6 +12,14 @@ fn main() {
   let path: &str = "code/main.dym";
   let code: &str = &read_file(path);
   let mut tokens: Vec<TokenTypes> = lexer::lex(code);
+  for token in &tokens {
+    println!("{}", token);
+  }
+  println!("---------------------------");
+  post_process(&mut tokens);
+  for token in &tokens {
+    println!("{}", token);
+  }
 
   // lexer::set_st(code.to_string());
   // while !lexer::st_empty() {
