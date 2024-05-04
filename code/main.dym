@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 function():
         ldksfj
         jkdfsa
@@ -10,3 +11,15 @@ j
 sdfhjlzj
 sldjf
 ljk
+=======
+funcname(argument):
+  funcname = (){
+    return agrument+`arg`
+  }
+b = a ?= 1 # equality
+funcname() = return
+100_000.05iE-4
+.01 43.
+
+", cva \"nx"
+>>>>>>> fd61c22 (line groups)

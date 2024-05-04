@@ -1,3 +1,23 @@
+Order of precedence of statements and operations:
+  if/else, for, while, try, func(){}
+  break, continue, return, yield, raise
+  ;
+  =, +=, -=, *=, /=, \%=, //=, **=, &=, |=, ^=, >>=, <<=
+  ,
+  ->
+  y if x else z, x?y:z
+  &&, ||, and, or, nand, nor, xor, xnor
+  is, not is, in, not in, ?=, !=, >, <, >=, <=
+  not
+  +, -
+  *, /, \%, //
+  **
+  &, |, ^, >>, <<
+  ~, !, ?, ++, --, *x
+  ..
+  ::, .
+  x(), x[], (){}
+
 Code blocks:
   A code block is defined as a group of statements executed together.
   Like everything else, a code block can be used as an expression, and it evaluates to null.
