@@ -13,19 +13,8 @@ fn main() {
   let path: &str = "code/main.dym";
   let code: &str = &read_file(path);
   let mut tokens: Vec<TokenType> = lexer::lex(code);
-  for token in &tokens {
-    // println!("{}", token);
-  }
-  println!("---------------------------");
-  post_process(&mut tokens);
-  for token in &tokens {
-    println!("{}", token);
-  }
 
-  // lexer::set_st(code.to_string());
-  // while !lexer::st_empty() {
-  //   runinifier::def_dynanite_proc(lexer::advance());
-  // }
+  post_process(&mut tokens);
 }
 
 pub fn read_file(path: &str) -> String {

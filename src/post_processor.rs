@@ -99,11 +99,9 @@ fn paren_classify(tokens: &mut Vec<TokenType>, i: usize) {
 }
 
 fn curly_add(tokens: &mut Vec<TokenType>, i: usize) {
-    println!("--------------");
     let mut j: usize = i + 1;
     let mut count: i32 = 1;
     while j < tokens.len() && ![TokenType::Comma, TokenType::LineFeed].contains(&tokens[j]) && count > 0 {
-        println!("{}, {}", count, tokens[j]);
         match tokens[j] {
             TokenType::LeftParenthesis => count += 1,
             TokenType::RightParenthesis => count -= 1,
@@ -112,7 +110,6 @@ fn curly_add(tokens: &mut Vec<TokenType>, i: usize) {
         j += 1;
     }
 
-    // println!("{}, {}", tokens[i + 1], tokens[j]);
     tokens.insert(i + 1, TokenType::LeftCurlyBracket);
     tokens.insert(j, TokenType::RightCurlyBracket);
 }
