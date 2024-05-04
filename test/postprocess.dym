@@ -1,0 +1,4 @@
+foo() {
+    bar = () => (baz + bonk)
+}
+bop((beep) => bope)
