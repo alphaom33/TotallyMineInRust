@@ -8,7 +8,6 @@ use tokenizer::TokenType;
 use post_processor::post_process;
 
 mod tokenizer;
-mod runinifier;
 mod post_processor;
 #[cfg(test)]
 mod tests;
