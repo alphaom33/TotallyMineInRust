@@ -13,7 +13,7 @@ fn main() {
   let code: &str = &read_file(path);
   let mut tokens: Vec<TokenTypes> = lexer::lex(code);
   for token in &tokens {
-    println!("{}", token);
+    // println!("{}", token);
   }
   println!("---------------------------");
   post_process(&mut tokens);

@@ -16,12 +16,12 @@ fn paren_add(tokens: &mut Vec<TokenTypes>, i: usize) {
 
     let mut j: usize = i + 2;
     while tokens[j] != TokenTypes::RightParenthesis {
-        println!("{}", tokens[j]);
         j += 1;
         if j > tokens.len() {
             return;
         }
     }
+    println!("{}", tokens[j]);
 
     let mut k = j;
     while tokens[k] == TokenTypes::LineFeed {
@@ -32,5 +32,5 @@ fn paren_add(tokens: &mut Vec<TokenTypes>, i: usize) {
     }
 
     tokens.insert(i + 1, TokenTypes::Set);
-    tokens.insert(k, TokenTypes::Lambda);
+    tokens.insert(k + 2, TokenTypes::Lambda);
 }
