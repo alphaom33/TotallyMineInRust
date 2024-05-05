@@ -7,6 +7,13 @@ pub fn post_process(tokens: &mut Vec<TokenType>) {
         tokens.push(TokenType::LineFeed);
     }
 
+    scan_curlies(tokens);
+    scan_sets(tokens);
+    scan_lambda_curlies(tokens);
+    scan_classify_parens(tokens);
+}
+
+fn scan_curlies(tokens: &mut Vec<TokenType>) {
     for i in 0..tokens.len() {
         match &tokens[i] {
             TokenType::LeftCurlyBracket if tokens[i - 1] != TokenType::Lambda => {
@@ -15,7 +22,9 @@ pub fn post_process(tokens: &mut Vec<TokenType>) {
             _ => (),
         }
     }
+}
 
+fn scan_sets(tokens: &mut Vec<TokenType>) {
     let mut to_add: Vec<usize> = Vec::new();
     for i in 0..tokens.len() {
         match &tokens[i] {
@@ -35,7 +44,9 @@ pub fn post_process(tokens: &mut Vec<TokenType>) {
             add_sad += 1;
         }
     }
+}
 
+fn scan_lambda_curlies(tokens: &mut Vec<TokenType>) {
     for i in 0..tokens.len() {
         match &tokens[i] {
             TokenType::Lambda if tokens[i + 1] != TokenType::LeftCurlyBracket => {
@@ -44,12 +55,14 @@ pub fn post_process(tokens: &mut Vec<TokenType>) {
             _ => (),
         }
     }
+}
+fn scan_classify_parens(tokens: &mut Vec<TokenType>) {
     for i in 0..tokens.len() {
         match &tokens[i] {
             TokenType::LeftParenthesis => paren_classify(tokens, i),
             _ => (),
         }
-    }
+    }    
 }
 
 fn set_func_add(tokens: &Vec<TokenType>, i: usize) -> usize {
