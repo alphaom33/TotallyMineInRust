@@ -85,6 +85,14 @@ fn post_process_test() {
             TokenType::RightCurlyBracket,
             TokenType::RightCallParenthesis,
             TokenType::LineFeed,
+            TokenType::Name(String::from("barp")),
+            TokenType::Set,
+            TokenType::LeftFuncParenthesis,
+            TokenType::RightFuncParenthesis,
+            TokenType::Lambda,
+            TokenType::LeftCurlyBracket,
+            TokenType::RightCurlyBracket,
+            TokenType::LineFeed
         ]
     )
 }
