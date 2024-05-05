@@ -7,6 +7,7 @@ use post_processor::post_process;
 mod lexer;
 mod runinifier;
 mod post_processor;
+#[cfg(test)]
 mod tests;
 
 fn main() {

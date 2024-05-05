@@ -93,12 +93,6 @@ fn paren_classify(tokens: &mut Vec<TokenType>, i: usize) {
         _ => (),
     }
 
-    let k: usize = advance_to(j + 1, &tokens, TokenType::LineFeed, 1);
-    // let mut k: usize = j + 1;
-    // while tokens[k] == TokenType::LineFeed {
-    //     k += 1;
-    // }
-
     let to_add: (TokenType, TokenType);
     if tokens[j + 1] == TokenType::Lambda {
         to_add = (
