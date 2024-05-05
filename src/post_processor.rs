@@ -1,5 +1,3 @@
-use std::slice::Iter;
-
 use crate::TokenType;
 
 pub fn post_process(tokens: &mut Vec<TokenType>) {
@@ -56,6 +54,7 @@ fn scan_lambda_curlies(tokens: &mut Vec<TokenType>) {
         }
     }
 }
+
 fn scan_classify_parens(tokens: &mut Vec<TokenType>) {
     for i in 0..tokens.len() {
         match &tokens[i] {
@@ -94,10 +93,11 @@ fn paren_classify(tokens: &mut Vec<TokenType>, i: usize) {
         _ => (),
     }
 
-    let mut k: usize = j + 1;
-    while tokens[k] == TokenType::LineFeed {
-        k += 1;
-    }
+    let k: usize = advance_to(j + 1, &tokens, TokenType::LineFeed, 1);
+    // let mut k: usize = j + 1;
+    // while tokens[k] == TokenType::LineFeed {
+    //     k += 1;
+    // }
 
     let to_add: (TokenType, TokenType);
     if tokens[j + 1] == TokenType::Lambda {
