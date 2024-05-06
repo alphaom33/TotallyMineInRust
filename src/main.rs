@@ -12,6 +12,9 @@ mod post_processor;
 #[cfg(test)]
 mod tests;
 
+mod lexer;
+
+
 fn main() {
   let path: &str = "code/main.dym";
   let mut code: String = read_file(path);

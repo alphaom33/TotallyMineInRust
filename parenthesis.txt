@@ -1,0 +1,12 @@
+From what I can tell, there are four different uses of prenthesis; capturing, tupling, function making, and function calling
+I'm currently using the preprocessor (my code is in enums because why not) to have different enums for each use, so that we don't have to check at runtime
+My other possible idea is that everything in parenthesis is secretly a tuple, and when calling a function, that tuple gets enumerated and passed to it. This would have extra cost at runtime, but also likely make the code more clean. What do you propose?
+
+is this assuming we have a compiler?
+because i didnt want to use a compiler
+because of the way get_next and get_block work we kind of have to check it at runtime
+my plan for parentheses and pretty much everything else was that it would be returned as a string, and in the evaluator it would check around it to find its usage and evaluate the string
+but if you know a better way to do it maybe i will consider
+
+Compiling sounds interesting if it could occur, but preprocessing should work fine for now
+wdym preprocessing? how does that work?

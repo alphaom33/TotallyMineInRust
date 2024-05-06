@@ -7,11 +7,12 @@ pub struct Block {
   end: usize
 }
 
-static SYMBOLS: &str = "+\\-*/\\^%=><\\\\&|~;:,.!?'\\\"`@";
-static NO_NAME: &str = "()\\[\\]{}#\n";
+
+static NO_NAME: &str = "+\\-*/\\^%=><\\\\&|~;:,.!?'\"`@()\\[\\]{}#";
 static COMMENT_REGEX: &str = "(##(#?[^#])*##)|(#[^\n]*\n)";
-static SPACE_REGEX: &str = r"\s+";
+static SPACE_REGEX: &str = "([\\s^\n]|\n)+";
 static STRING_REGEX: &str = "`[^`]*`";
+static SYMBOL_REGEX: &str = r"->|[?+\-:.]{2}|([+\-*/%&|\^?!><]|[/*><]{2})=?|[@=;:,.~]";
 static DEC_REGEX: &str = r"(\d+(_(\d+))*)?\.?(\d+(_(\d+))*)+i?(e|E(\+|-)?\d+)?";
 static NUM_REGEX: &str = r"((0b[01]*\.?[01]+)|(0o[0-7]*\.?[0-7]+)|(0x[0-9a-fA-F]*\.?[0-9a-fA-F]+))i?";
 
@@ -98,10 +99,8 @@ pub fn get_next(code: &str) -> usize {
     return 1 + match_group(code, '}')
   }
   
-  let identifier_regex: &str = &format!(r"[^\d\s{}{}][^\s{}{}]*", SYMBOLS, NO_NAME, SYMBOLS, NO_NAME);
-  let symbol_regex: &str = &format!("[{}]+", SYMBOLS);
-  
-  let token_regex: Regex = Regex::new(&format!("^\n|({})|({})|({})|({})|({})|({})|({})", COMMENT_REGEX, SPACE_REGEX, DEC_REGEX, NUM_REGEX, STRING_REGEX, symbol_regex, identifier_regex)).unwrap();
+  let identifier_regex: &str = &format!(r"[^\d\s{}][^\s{}]*", NO_NAME, NO_NAME);
+  let token_regex: Regex = Regex::new(&format!("^({})|({})|({})|({})|({})|({})|({})", COMMENT_REGEX, SPACE_REGEX, DEC_REGEX, NUM_REGEX, STRING_REGEX, SYMBOL_REGEX, identifier_regex)).unwrap();
 
   let token: Option<Match> = Regex::find(&token_regex, code);
   if !token.is_none() {
@@ -145,5 +144,4 @@ pub fn get_block(code: &str) -> Block {
     block: tokens,
     end: end
   };
-
 }
