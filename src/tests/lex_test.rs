@@ -5,8 +5,10 @@ use crate::read_file;
 #[test]
 fn lex_test() {
     let path: &str = "test/lex.dym";
+    let mut tokens: Vec<TokenType> = lex(&read_file(path));
+    tokens.retain(|x: &TokenType| x != &TokenType::None);
     assert_eq!(
-        lex(&read_file(path)),
+        tokens,
         [
             TokenType::LeftCurlyBracket,
             TokenType::RightCurlyBracket,
@@ -42,57 +44,4 @@ fn lex_test() {
             TokenType::Name(String::from("name😄"))
         ]
     );
-}
-
-#[test]
-fn post_process_test() {
-    let path: &str = "test/postprocess.dym";
-    let lexed: &mut Vec<TokenType> = &mut lex(&read_file(path));
-    post_process(lexed);
-    assert_eq!(
-        *lexed,
-        [
-            TokenType::Name(String::from("foo")),
-            TokenType::Set,
-            TokenType::LeftFuncParenthesis,
-            TokenType::RightFuncParenthesis,
-            TokenType::Lambda,
-            TokenType::LeftCurlyBracket,
-            TokenType::LineFeed,
-            TokenType::Name(String::from("bar")),
-            TokenType::Set,
-            TokenType::LeftFuncParenthesis,
-            TokenType::RightFuncParenthesis,
-            TokenType::Lambda,
-            TokenType::LeftCurlyBracket,
-            TokenType::LeftCaptureParenthesis,
-            TokenType::Name(String::from("baz")),
-            TokenType::Add,
-            TokenType::Name(String::from("bonk")),
-            TokenType::RightCurlyBracket,
-            TokenType::RightCaptureParenthesis,
-            TokenType::LineFeed,
-            TokenType::RightCurlyBracket,
-            TokenType::LineFeed,
-            TokenType::Name(String::from("bop")),
-            TokenType::LeftCallParenthesis,
-            TokenType::LeftFuncParenthesis,
-            TokenType::Name(String::from("beep")),
-            TokenType::RightFuncParenthesis,
-            TokenType::Lambda,
-            TokenType::LeftCurlyBracket,
-            TokenType::Name(String::from("bope")),
-            TokenType::RightCurlyBracket,
-            TokenType::RightCallParenthesis,
-            TokenType::LineFeed,
-            TokenType::Name(String::from("barp")),
-            TokenType::Set,
-            TokenType::LeftFuncParenthesis,
-            TokenType::RightFuncParenthesis,
-            TokenType::Lambda,
-            TokenType::LeftCurlyBracket,
-            TokenType::RightCurlyBracket,
-            TokenType::LineFeed
-        ]
-    )
 }

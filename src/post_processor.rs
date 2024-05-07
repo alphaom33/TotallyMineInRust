@@ -1,9 +1,11 @@
+use std::{iter::{Enumerate, Skip}, slice::Iter};
+
 use crate::TokenType;
 
 pub fn post_process(tokens: &mut Vec<TokenType>) {
-    if tokens.last().unwrap() != &TokenType::LineFeed {
-        tokens.push(TokenType::LineFeed);
-    }
+
+    change_python(tokens);
+    tokens.retain(|x: &TokenType| ![TokenType::None, TokenType::Tab].contains(x));
 
     scan_curlies(tokens);
     scan_sets(tokens);
@@ -11,8 +13,34 @@ pub fn post_process(tokens: &mut Vec<TokenType>) {
     scan_classify_parens(tokens);
 }
 
-fn scan_curlies(tokens: &mut Vec<TokenType>) {
+fn change_python(tokens: &mut Vec<TokenType>) {
     for i in 0..tokens.len() {
+        match &tokens[i] {
+
+            TokenType::Colon if tokens[i - 1] == TokenType::RightParenthesis => {
+                let start: usize = advance_to(i, tokens, TokenType::LineFeed, -1);
+                let num_tabs: usize;
+
+                if start != tokens.len() {
+                    println!("{}, {}", start, tokens[start]);
+                    let mut j: usize = start + 1;
+                    while j < tokens.len() && tokens[j] == TokenType::Tab {
+                        j += 1;
+                    }
+                    num_tabs = (j - start) - 1;
+                } else {
+                    num_tabs = 0;
+                }
+                println!("{}", num_tabs);
+                check_fun_tabs(num_tabs, tokens, i);
+            }
+            _ => (),
+        }
+    }
+}
+
+fn scan_curlies(tokens: &mut Vec<TokenType>) {
+    for i in 1..tokens.len() {
         match &tokens[i] {
             TokenType::LeftCurlyBracket if tokens[i - 1] != TokenType::Lambda => {
                 tokens.insert(i, TokenType::Lambda)
@@ -28,10 +56,10 @@ fn scan_sets(tokens: &mut Vec<TokenType>) {
         match &tokens[i] {
             TokenType::Lambda => {
                 let index: usize = set_func_add(tokens, i);
-                if  index != tokens.len() {
+                if index != tokens.len() {
                     to_add.push(index);
                 }
-            },
+            }
             _ => (),
         }
     }
@@ -61,7 +89,7 @@ fn scan_classify_parens(tokens: &mut Vec<TokenType>) {
             TokenType::LeftParenthesis => paren_classify(tokens, i),
             _ => (),
         }
-    }    
+    }
 }
 
 fn set_func_add(tokens: &Vec<TokenType>, i: usize) -> usize {
@@ -69,7 +97,7 @@ fn set_func_add(tokens: &Vec<TokenType>, i: usize) -> usize {
     return match tokens[j - 1] {
         TokenType::Name(_) => j,
         _ => usize::MAX,
-    }
+    };
 }
 
 fn paren_classify(tokens: &mut Vec<TokenType>, i: usize) {
@@ -138,4 +166,34 @@ fn advance_to(start: usize, array: &Vec<TokenType>, token: TokenType, sign: i32)
         }
     }
     return i;
+}
+
+fn check_fun_tabs(num_tabs: usize, tokens: &mut Vec<TokenType>, start_dex: usize) {
+    let mut cur_tabs: usize = 10000;
+    let mut token_iter: Skip<Enumerate<Iter<TokenType>>> = tokens.iter().enumerate().skip(start_dex);
+    let mut index: usize = 0;
+    
+    while let Some((i, t)) = token_iter.next() {
+        index = i;
+        match t {
+            TokenType::LineFeed if i < tokens.len() - 1 => {
+                let mut tabs: (usize, &TokenType) = token_iter.next().unwrap();
+                cur_tabs = 0;
+                while tabs.0 < tokens.len() && tabs.1 == &TokenType::Tab {
+                    cur_tabs += 1;  
+                    tabs = token_iter.next().unwrap();
+                }
+                if cur_tabs <= num_tabs {
+                    break;
+                }
+            }
+
+            _ => (),
+        }
+    }
+    tokens[start_dex] = TokenType::LeftCurlyBracket;
+    let a: usize = advance_to(index - 1, tokens, TokenType::LineFeed, -1);
+    let dex: usize = advance_to(index, tokens, TokenType::LineFeed, -1) + 1;
+    tokens.insert(dex, TokenType::RightCurlyBracket);
+    tokens.insert(dex + 1, TokenType::LineFeed);
 }
