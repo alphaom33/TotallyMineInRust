@@ -4,10 +4,10 @@ use std::iter::Peekable;
 use std::slice::Iter;
 use std::str::Chars;
 
-use lexer::TokenType;
+use tokenizer::TokenType;
 use post_processor::post_process;
 
-mod lexer;
+mod tokenizer;
 mod runinifier;
 mod post_processor;
 #[cfg(test)]
@@ -23,7 +23,7 @@ fn main() {
   if !code.contains('\t') {
     code = spaces_to_tabs(&mut code);
   }
-  let mut tokens: Vec<TokenType> = lexer::lex(&code);
+  let mut tokens: Vec<TokenType> = tokenizer::lex(&code);
 
   post_process(&mut tokens);
   println!("{:?}", tokens);

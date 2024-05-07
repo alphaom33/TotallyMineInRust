@@ -1,4 +1,4 @@
-use crate::{lexer::{lex, TokenType}, post_processor::post_process, read_file};
+use crate::{tokenizer::{lex, TokenType}, post_processor::post_process, read_file};
 
 
 #[test]

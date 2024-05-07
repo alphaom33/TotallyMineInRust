@@ -1,4 +1,4 @@
-use crate::lexer::{lex, TokenType};
+use crate::tokenizer::{lex, TokenType};
 use crate::post_processor::post_process;
 use crate::read_file;
 
