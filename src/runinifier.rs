@@ -1,10 +1,8 @@
-mod lexer;
-// I'm goingn to branch and run this in a codespace so delete runinifier if you feel like it
-fn defDynaniteProc(token: &str) {
-  match token {
-    "#" => while() {
-      
-    },
-    _ => println!("varname"),
-  }
-}
+// use crate::lexer::advance;
+
+// pub fn def_dynanite_proc(token: String) {
+//   match token.as_str() {
+//     // "#" => while token != "\n" {token = advance();},
+//     _ => println!("{}", token.as_str()),
+//   }
+// }
