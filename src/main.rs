@@ -15,6 +15,14 @@ mod tests;
 
 fn main() {
   let path: &str = "code/main.dym";
+  let code: String = preprocess(path);
+  let mut tokens: Vec<TokenType> = tokenizer::lex(&code);
+
+  post_process(&mut tokens);
+  println!("{:?}", tokens);
+}
+
+pub fn preprocess(path: &str) -> String {
   let mut code: String = read_file(path);
   if code.chars().last().unwrap() != '\n' {
     code += "\n";
@@ -23,13 +31,10 @@ fn main() {
   if !code.contains('\t') {
     code = spaces_to_tabs(&mut code);
   }
-  let mut tokens: Vec<TokenType> = tokenizer::lex(&code);
-
-  post_process(&mut tokens);
-  println!("{:?}", tokens);
+  return code;
 }
 
-fn spaces_to_tabs(code: &mut str) -> String {
+pub fn spaces_to_tabs(code: &mut str) -> String {
   let mut thingy: Vec<char> = code.chars().collect();
   let mut code_iter: Peekable<Iter<char>> = thingy.iter().peekable();
   let mut num_spaces: i32 = 0;
@@ -37,7 +42,7 @@ fn spaces_to_tabs(code: &mut str) -> String {
   while let Some(c) = code_iter.next() {
     match c {
       '\n' => {
-        if *code_iter.peek().unwrap() == &' ' {
+        if code_iter.peek().is_some() && *code_iter.peek().unwrap() == &' ' {
           while code_iter.next().unwrap() == &' ' {
             num_spaces += 1;
           }

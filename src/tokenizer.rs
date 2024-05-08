@@ -107,7 +107,7 @@ fn match_basic(c: char, code_iter: &mut Peekable<Chars>, i: usize, code: &str) -
             }
             TokenType::None
         }
-        '\n' => TokenType::LineFeed,
+        '\n' | ';' => TokenType::LineFeed,
         ',' => TokenType::Comma,
         '"' | '\'' => {
             let mut accumulator: String = String::new();
@@ -172,7 +172,7 @@ fn match_basic(c: char, code_iter: &mut Peekable<Chars>, i: usize, code: &str) -
                     break 'notcleanup;
                 }
                 while ![
-                    '=', '?', '!', '>', '<', ',', '(', ')', '{', '}', '[', ']', ' ', '\n', '\r',
+                    '=', ';', '?', '!', '>', '<', ',', '(', ')', '{', '}', '[', ']', ' ', '\n', '\r',
                 ]
                 .contains(code_iter.peek().unwrap())
                 {

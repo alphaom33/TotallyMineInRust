@@ -5,7 +5,7 @@ use crate::TokenType;
 pub fn post_process(tokens: &mut Vec<TokenType>) {
 
     change_python(tokens);
-    tokens.retain(|x: &TokenType| ![TokenType::None, TokenType::Tab].contains(x));
+    kill_nulls(tokens);
 
     scan_curlies(tokens);
     scan_sets(tokens);
@@ -13,7 +13,11 @@ pub fn post_process(tokens: &mut Vec<TokenType>) {
     scan_classify_parens(tokens);
 }
 
-fn change_python(tokens: &mut Vec<TokenType>) {
+pub fn kill_nulls(tokens: &mut Vec<TokenType>) {
+    tokens.retain(|x: &TokenType| ![TokenType::None, TokenType::Tab].contains(x));
+}
+
+pub fn change_python(tokens: &mut Vec<TokenType>) {
     for i in 0..tokens.len() {
         match &tokens[i] {
 
@@ -39,18 +43,20 @@ fn change_python(tokens: &mut Vec<TokenType>) {
     }
 }
 
-fn scan_curlies(tokens: &mut Vec<TokenType>) {
-    for i in 1..tokens.len() {
+pub fn scan_curlies(tokens: &mut Vec<TokenType>) {
+    let mut i: usize = 0;
+    while i < tokens.len() {
         match &tokens[i] {
             TokenType::LeftCurlyBracket if tokens[i - 1] != TokenType::Lambda => {
                 tokens.insert(i, TokenType::Lambda)
             }
             _ => (),
         }
+        i += 1;
     }
 }
 
-fn scan_sets(tokens: &mut Vec<TokenType>) {
+pub fn scan_sets(tokens: &mut Vec<TokenType>) {
     let mut to_add: Vec<usize> = Vec::new();
     for i in 0..tokens.len() {
         match &tokens[i] {
@@ -72,18 +78,20 @@ fn scan_sets(tokens: &mut Vec<TokenType>) {
     }
 }
 
-fn scan_lambda_curlies(tokens: &mut Vec<TokenType>) {
-    for i in 0..tokens.len() {
-        match &tokens[i] {
+pub fn scan_lambda_curlies(tokens: &mut Vec<TokenType>) {
+    let mut i: usize = 0;
+    while i < tokens.len() {
+        match tokens[i] {
             TokenType::Lambda if tokens[i + 1] != TokenType::LeftCurlyBracket => {
                 curly_add(tokens, i)
             }
             _ => (),
         }
+        i += 1;
     }
 }
 
-fn scan_classify_parens(tokens: &mut Vec<TokenType>) {
+pub fn scan_classify_parens(tokens: &mut Vec<TokenType>) {
     for i in 0..tokens.len() {
         match &tokens[i] {
             TokenType::LeftParenthesis => paren_classify(tokens, i),
@@ -154,7 +162,7 @@ fn curly_add(tokens: &mut Vec<TokenType>, i: usize) {
     }
 
     tokens.insert(i + 1, TokenType::LeftCurlyBracket);
-    tokens.insert(j, TokenType::RightCurlyBracket);
+    tokens.insert(j + 1, TokenType::RightCurlyBracket);
 }
 
 fn advance_to(start: usize, array: &Vec<TokenType>, token: TokenType, sign: i32) -> usize {
