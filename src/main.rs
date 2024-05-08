@@ -8,13 +8,15 @@ use tokenizer::TokenType;
 use post_processor::post_process;
 
 mod tokenizer;
-mod runinifier;
 mod post_processor;
 #[cfg(test)]
 mod tests;
 
+mod lexer;
+
+
 fn main() {
-  let path: &str = "code/main.dym";
+  let path: &str = "code/main.dnm";
   let mut code: String = read_file(path);
   if code.chars().last().unwrap() != '\n' {
     code += "\n";

@@ -1,0 +1,136 @@
+# Why did I make this
+
+## COLLECTIONS ##
+array[-1] # gets last element
+object[-1] # gets item -1
+
+[*array] # spreads natural number attributes only
+[*object] # spreads all attributes
+/value # gets value only, no attributes (may be changed)
+$collection # toggles mutability (may be changed)
+
+array(object) # creates array from object
+array.to_object() # creates object from array
+
+[a, b, c] # creates array
+[a, b, c: 5]
+# creates object: [0: a, 1: b, c: 5]
+[a=2, ‘b’: 3, h: 5] where h=‘c’
+# [‘a’: 2, ‘b’: 3, ‘c’: 5]
+[1: ‘h’, 3: ‘o’, :‘g’, ‘c’, ‘d’]
+# [1, ‘h’, 3: ‘o’, 5: ‘g’, 7: ‘c’, 9: ‘d’]
+[1:, 5, 92, 50, 4]
+# Creates set [1: true, 5: true, 92: true, 50: true, 4: true]
+
+# Object oriented programming
+Dog = Animal + [
+  ‘age’: 0,
+  has_tail = true,
+  create(@, *args) {
+    @ += args
+  },
+  bark(@): print(“{@name} barked!”)
+]
+
+##
+When a method is called with a double colon, instead of modifying the object,
+it passes a copy of itself in the “self” (@) parameter and returns it.
+##
+my_dog = Dog::create(name=“Shelby”, age=3)
+my_dog.bark()
+
+
+## OPERATIONS ##
+1+1 ?= 2
+1 ?= 1.0
+a ?= b ?= c # a?=b and b?=c
+a >= b ?= c # a>=b and b?=c
+a < b < c # a<b and b<c
+2 > 5+3i # MathError!
+
+a + b ?= a.__add__(b)
+1 + “2” ?= “12”
+1 - “2” # TypeError!
+“hi” * 5 ?= “hihihihihi”
+
+[1, 2, 3] + [2, 3, 4] ?= [1, 2, 3, 2, 3, 4]
+[a=1, b=2] + [b=1, c=3] ?= [a=1, b=1, c=3]
+
+4 * [3, 7] ?= [3, 7, 3, 7, 3, 7, 3, 7]
+10 * [a=1, b=2] # TypeError!
+
+[1, 2, 3] & [2, 3, 4] ?= [2, 3]
+[a=1, b=2] | [b=1, c=3] ?= [b=1]
+
+[1, 2, 3] | [2, 3, 4] ?= [1, 2, 3, 4]
+[a=1, b=2] | [b=1, c=3] ?= [a=1, b=2, c=3]
+
+[1, 2, 3] ^ [2, 3, 4] ?= [1, 4]
+[a=1, b=2] | [b=1, c=3] ?= [a=1, c=3]
+
+2:5 ?= range(2, 5)
+2:50:3 ?= range(2, 50, step=3)
+50: ?= range(50, infinity)
+2..5 ?= interval(2, 5)
+2..<5 ?= interval(2, 5, exclude_stop=true)
+2<..<5 ?= interval(2, 5, true, true)
+..-2 ?= interval(-infinity, -2)
+<..9 # ValueError!
+
+Dog::new() is Dog::new() # false
+my_dog ?= your_dog where (your_dog = my_dog) # true
+null is null # true
+my_dog not is null # true
+
+:10 in [1, 2, 10] # true
+2:10 in [1, 2, 10] # true
+1:10 in [1, 2, 10] # false
+5 not in [1, 2, 10] # true
+'a': 2 not in [a=1, b=3] # true
+4 in [x=4, y=5, z=6]
+4 in [7, 8, 9, 10, 11, 12]
+# no colon checks for item in keys and values
+
+3 not in 2:5 # false
+3.5 not in 2:5 # true
+3.5 in 2..5 # true
+5 in 2..<5 # false
+
+?a ?= a.__has_value__()
+a? ?= a.__is_truthy__()
+!a ?= a.__is_falsy__()
+
+1 and 2 # 2
+2 and 1 # 1
+0 and 3 # 0
+1 && 2 # true
+2 && 1 # true
+0 && 3 # false
+
+1 or 2 # 1
+2 or 1 # 2
+0 or 0 # 0
+1 || 2 # true
+2 || 1 # true
+0 || 0 # false
+
+a nand b ?= !(a and b)
+a nor b ?= !(a or b)
+a xor b ?= (a? ?= b?)
+a xnor b ?= (a? != b?)
+
+a = 1
+print(++a)
+print(a)
+# 2, 2
+
+a = 1
+print(a++)
+print(a)
+# 1, 2
+
+[2, 3, 4].find(5) # ValueError!
+[2, 3, 4].find(5) except e: print("value not found")
+
+[2, 3, 4] >> 2 ?= [null, null, 2, 3, 4]
+[2, 3, 4] << 1 ?= [3, 4]

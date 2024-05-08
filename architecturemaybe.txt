@@ -1,0 +1,7 @@
+an object for each scope
+we start with a global struct, which contains a map with keys for each variable
+it will parse through the code line by line until it encounters a smaller scope, at which point a 'subclass' will be launched representing some smaller scope
+When searching for variables, we start in the current struct, then move upwards until parent == null
+once the scope finishes, it will be freed
+
+That sounds good but we may or may not need to make some adjustments.

@@ -1,0 +1,132 @@
+# unit tests for lexer, line splitter, and preprocessor
+# well not really unit tests but things to test
+
+# comment
+
+do stuff # commeeeent
+##multi line comment##
+
+## a reeeeeeee-
+eeeeee-
+eeeeeeeally long comment ##
+
+do ## inline comment ## stuff
+do_stuff(##I'm in here!##)
+
+
+`raw string`
+`forgot \` raw` # Oops!
+do = `stuff`
+
+`look
+a long
+raw string!`
+
+  "indentation"
+  'indents'
+  'It\'s an escape sequence!'
+     "Escape the \\" escape"
+     "Switchin\' it around"
+     'I wanna be the guy\"'
+     "All they wa to the\""
+  "New line?\n"
+  "New
+line."
+  'Do\nit again?'
+'Doin\'
+it again.'
+"Unclose\" # Oops!
+
+1
+193948
+508_000_002
+3_84_111111_0
+12._05 # Oops!
+193_ # Oops!
+20__51 # Oops!
+20e17 20E+17 20e-18
+28i
+55.09i
+25e2i # Oops!
+120e2_000 # Not implemented
+3iE+402
+0b00100110
+1b00100110 # Oops!
+0b2810 # Oops!
+0b101.00101
+0b01010101i
+0b10101e10 # Won't implement
+0o7102
+0o81 # Oops!
+0o5.1023
+0o451i
+0xaef013
+0xEB72c.0f
+0xbead123
+0xhelo # Oops!
+0xF.FECi
+
+()
+(((())))
+(()(()))
+(stuff)
+([more] stuff)
+([)] # Oops!
+{() [()]{}}
+[idk, what, to, do, here]
+(
+long capturee)
+
+(args) {instruction}
+arg -> the_thing
+(a, b) -> c
+nameofthing():
+  # do this stuff
+  
+nameofthing()
+ return this(stuff)
+nameofthing = (){
+      # do this stuff
+}
+nameofthing(){
+    # do this stuff
+} name of thing(){} # What should happen here?
+nameofthing(s, t, u) = s+t+u
+nameofthing = (s,t,u) -> s*t*u
+
+a+b
++a
+-b
+b-c*a
+b+-a
+-b+c
++-s
+f++c # Not implemented
+f**g*r
+r*v+n**h
+n**j+k
+++a
+a++
+--r
+r--
+s/c
+s//c
+g//c/d
+f**z%c
+%do # Oops!
+l%s-e
+n%(d//v)
+s&t
+t&-s
+z-&t # Oops!
+s|42.0
+s^nh|32
+wa>>0
+aw>>3&l
+2<<folk
+~a+b*c-d/e%f//g^h&i|j^k>>l<<m
+~unary_thing
+
+do, then, again
+do; then; upgrade
+nest it, all; up!
