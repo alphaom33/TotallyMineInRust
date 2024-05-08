@@ -60,59 +60,6 @@ struct Block {
 }
 
 
-/*pub fn match_quote(code: &str) -> usize {
-  let quote: char = code.chars().nth(0).unwrap();
-  let mut i: usize = 0;
-  
-  while i < code.len() - 1 {
-    i += 1;
-    let current: char = code.chars().nth(i).unwrap();
-    if current == quote {
-      break;
-    } if current == '\\' {
-      i += 1;
-      continue;
-    } else if current == '{' {
-      i += match_group(&code[i..], '}');
-    }
-  }
-  return i;
-}*/
-/*pub fn match_group(code: &str, close: char) -> usize {
-  let open: char = code.chars().nth(0).unwrap();
-  let mut i: usize = 0;
-  let mut balance: i32 = 0;
-  
-  while i < code.len() {
-    let current: char = code.chars().nth(i).unwrap();
-    let prev: Option<char> = code.chars().nth(i);
-
-    // TODO: improve this code if possible
-    // probably would send calls to get_next
-    // if not then i think the lexer is done for now
-    if current == '`' {
-      i += 1 + code[i+1..].find("`").unwrap();
-    } else if current == '#' && !prev.is_none() && prev.unwrap() == '#' {
-      i += 2 + code[i+1..].find("##").unwrap();
-    } else if current == '#' {
-      i += 1 + code[i+1..].find("\n").unwrap();
-    }
-    else if current == '"' || current == '\'' {
-      i += match_quote(&code[i..]);
-    } else if current == open {
-      balance += 1;
-    } else if current == close {
-      balance -= 1;
-    }
-    if balance == 0 {
-      return i;
-    }
-    i += 1;
-  }
-  return i;
-}*/
-
-
 // TODO someday: add support for nested formatted strings
 // (Python didn't add this until ver 3.12 lol)
 pub fn get_next(code: &str) -> Token {
@@ -130,41 +77,3 @@ pub fn get_next(code: &str) -> Token {
     }
   } panic!("SyntaxError: invalid token");
 }
-
-
-/*pub fn get_block(code: &str) -> Block {
-  let mut st: &str = code;
-  let mut tokens: Vec<String> = Vec::new();
-  let mut end: usize = 0;
-
-  // TODO: fix indented code block implementation
-  while !st.is_empty() {
-    let ind: usize = get_next(st);
-    let current: &str = &st[..ind];
-
-    if end == 0 {
-      // do stuff
-    } else if current == "\n" {
-      end += 1;
-      break;
-    } else if current.starts_with("{") && current.ends_with("}") {
-      break;
-    } else if current.starts_with("#") && current.ends_with("\n") {
-      end += ind;
-      break;
-    } else if current.trim().is_empty() || current.starts_with("##") {
-      end += ind;
-      st = &st[ind..];
-      continue;
-    }
-
-    tokens.push(current.to_string());
-    end += ind;
-    st = &st[ind..];
-  }
-
-  return Block {
-    block: tokens,
-    end: end
-  };
-}*/

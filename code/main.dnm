@@ -1,17 +1,3 @@
-<<<<<<< HEAD
-function():
-        ldksfj
-        jkdfsa
-        dskfj
-        yes():
-                kljfsd():
-                        jklsdf
-j
-        
-sdfhjlzj
-sldjf
-ljk
-=======
 funcname(argument):
   funcname = (){
     return agrument+`arg`
@@ -22,4 +8,3 @@ funcname() = return
 .01 43.
 
 ", cva \"nx"
->>>>>>> fd61c22 (line groups)

@@ -16,7 +16,7 @@ mod lexer;
 
 
 fn main() {
-  let path: &str = "code/main.dym";
+  let path: &str = "code/main.dnm";
   let mut code: String = read_file(path);
   if code.chars().last().unwrap() != '\n' {
     code += "\n";
