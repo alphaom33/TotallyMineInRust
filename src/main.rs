@@ -2,23 +2,27 @@ use std::io::Read;
 use std::fs::File;
 use std::iter::Peekable;
 use std::slice::Iter;
-use std::str::Chars;
+//use std::str::Chars;
 
-use tokenizer::TokenType;
-use post_processor::post_process;
+//use tokenizer::TokenType;
+//use post_processor::post_process;
 
-mod tokenizer;
-mod post_processor;
-#[cfg(test)]
-mod tests;
+//mod tokenizer;
+//mod post_processor;
+//#[cfg(test)]
+//mod tests;
 
 mod lexer;
 
 
 fn main() {
   let path: &str = "code/main.dnm";
-  let mut code: String = read_file(path);
-  if code.chars().last().unwrap() != '\n' {
+  let code: &str = &read_file(path);
+  for i in lexer::lex(&code) {
+    println!("{}", i.string);
+  }
+  
+  /*if code.chars().last().unwrap() != '\n' {
     code += "\n";
   }
 
@@ -28,7 +32,7 @@ fn main() {
   let mut tokens: Vec<TokenType> = tokenizer::lex(&code);
 
   post_process(&mut tokens);
-  println!("{:?}", tokens);
+  println!("{:?}", tokens);*/
 }
 
 fn spaces_to_tabs(code: &mut str) -> String {
