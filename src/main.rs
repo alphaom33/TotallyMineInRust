@@ -14,12 +14,14 @@ use std::slice::Iter;
 
 mod lexer;
 
-
 fn main() {
   let path: &str = "code/main.dnm";
   let code: &str = &read_file(path);
   for i in lexer::lex(&code) {
-    println!("{}", i.string);
+    match i.token {
+      lexer::TokenType::Identifier(k) | lexer::TokenType::DecimalNum(k) | lexer::TokenType::Number(k) | lexer::TokenType::String(k) | lexer::TokenType::GroupOpen(k) | lexer::TokenType::GroupClose(k) | lexer::TokenType::Symbol(k) | lexer::TokenType::Whitespace(k) => println!("{}", k),
+      _ => ()
+    }
   }
   
   /*if code.chars().last().unwrap() != '\n' {

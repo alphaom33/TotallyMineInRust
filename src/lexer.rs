@@ -14,44 +14,55 @@ pub fn matches_regex(regex: &str, token: &str) -> bool {
   return Regex::is_match(&Regex::new(regex).unwrap(), &token);
 }
 
-enum TokenType {
-  Identifier,
-  DecimalNum,
-  Number,
-  String,
-  GroupOpen,
-  GroupClose,
-  Symbol,
-  Whitespace,
+pub enum TokenType {
+  ParenGroup(Vec<Token>),
+  BracketGroup(Vec<Token>),
+  BraceGroup(Vec<Token>),
+  Identifier(String),
+  DecimalNum(String),
+  Number(String),
+  String(String),
+  GroupOpen(String),
+  GroupClose(String),
+  Symbol(String),
+  Whitespace(String),
   LineFeed,
   Comment
 }
 
 pub struct Token {
-  token: TokenType,
-  pub string: String
+  pub token: TokenType,
+  length: usize
 }
 
-fn token_type(token: &str) -> TokenType {
+fn create_token(token: &str) -> Token {
+  let token_type: TokenType;
   if token == "\n" {
-    return TokenType::LineFeed;
+    token_type = TokenType::LineFeed;
   } else if token.starts_with("#") {
-    return TokenType::Comment;
+    token_type = TokenType::Comment;
   } else if "([{".contains(&token) {
-    return TokenType::GroupOpen;
+    token_type = TokenType::GroupOpen(token.to_string());
   } else if ")]}".contains(&token) {
-    return TokenType::GroupClose;
+    token_type = TokenType::GroupClose(token.to_string());
   } else if token.trim().is_empty() {
-    return TokenType::Whitespace;
+    token_type = TokenType::Whitespace(token.to_string());
   } else if matches_regex(STRING_REGEX, &token) {
-    return TokenType::String;
+    token_type = TokenType::String(token.to_string());
   } else if matches_regex(DEC_REGEX, &token) {
-    return TokenType::DecimalNum;
+    token_type = TokenType::DecimalNum(token.to_string());
   } else if matches_regex(NUM_REGEX, &token) {
-    return TokenType::Number;
+    token_type = TokenType::Number(token.to_string());
   } else if matches_regex(SYMBOL_REGEX, &token) {
-    return TokenType::Symbol;
-  } return TokenType::Identifier;
+    token_type = TokenType::Symbol(token.to_string());
+  } else {
+    token_type = TokenType::Identifier(token.to_string());
+  }
+
+  return Token {
+    token: token_type,
+    length: token.len()
+  };
 }
 
 struct Block {
@@ -69,10 +80,8 @@ fn get_next(code: &str) -> Token {
   if !token.is_none() {
     let t: Match = token.unwrap();
     let string: &str = &code[..t.end()];
-    return Token {
-      token: token_type(string),
-      string: string.to_string()
-    };
+
+    return create_token(string);
   } panic!("SyntaxError: invalid token, starting at:\n{}", code);
 }
 
@@ -80,8 +89,25 @@ pub fn lex(mut code: &str) -> Vec<Token> {
   let mut output: Vec<Token> = Vec::new();
   while !code.is_empty() {
     let current: Token = get_next(code);
-    code = &code[current.string.len()..];
+    code = &code[current.length..];
     output.push(current);
   }
   return output;
+}
+
+
+pub fn match_group(code: Vec<Token>) -> usize {
+  let mut i: usize = 0;
+  let mut balance: usize = 0;
+  
+  while i < code.len() {
+    let current: &Token = &code[i];
+    match current.token {
+      TokenType::GroupOpen(_) => balance += 1,
+      TokenType::GroupClose(_) => balance -= 1,
+      _ => (),
+    }
+    i += 1;
+  }
+  return balance;
 }
