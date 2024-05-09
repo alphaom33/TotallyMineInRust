@@ -25,9 +25,10 @@ fn main() {
   if !code.contains('\t') {
     code = spaces_to_tabs(&mut code);
   }
-  let mut tokens: Vec<TokenType> = tokenizer::lex(&code);
+  let mut tokens: Vec<lexer::Token> = lexer::lex(&code);
+  // let mut tokens: Vec<TokenType> = tokenizer::lex(&code);
 
-  post_process(&mut tokens);
+  // post_process(&mut tokens);
   println!("{:?}", tokens);
 }
 

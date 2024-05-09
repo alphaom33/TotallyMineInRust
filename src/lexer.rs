@@ -2,11 +2,11 @@ use std::vec::Vec;
 use regex::Regex;
 use regex::Match;
 
-static IDENTIFIER_REGEX: &str = "[^\\d\\s+\\-*/\\^%=><\\\\&|~;:,.!?'\"`@()\\[\\]{}#][^\\s+\\-*/\\^%=><\\\\&|~;:,.!?'\"`@()\\[\\]{}#]*";
+static IDENTIFIER_REGEX: &str = "[^\\d\\s+\\-*/\\^%=><\\\\&|~;:,.!?'\"`$@()\\[\\]{}#][^\\s+\\-*/\\^%=><\\\\&|~;:,.!?'\"`$@()\\[\\]{}#]*";
 static COMMENT_REGEX: &str = "(##(#?[^#])*##)|(#[^\n]*\n)";
 static SPACE_REGEX: &str = "([\\s^\n]|\n)+";
-static STRING_REGEX: &str = "`[^`]*`|'(\\\\.|[^'])'|\"(\\\\.|[^\"])\"";
-static SYMBOL_REGEX: &str = r"->|<?..<?|[?+\-:]{2}|([+\-*/%&|\^?!><]|[/*><]{2})=?|[$@=;:,.~()\[\]{}]";
+static STRING_REGEX: &str = "`[^`]*`|\\'(\\\\.|[^\\\\'])*\\'|\\\"(\\\\.|[^\\\\\"])*\\\"";
+static SYMBOL_REGEX: &str = r"->|<?\.\.<?|[?+\-:]{2}|([+\-*/%&|\^?!><]|[/*><]{2})=?|[$@=;:,.~()\[\]{}]";
 static DEC_REGEX: &str = r"(\d+(_(\d+))*)?\.?(\d+(_(\d+))*)+i?(e|E(\+|-)?\d+)?";
 static NUM_REGEX: &str = r"((0b[01]*\.?[01]+)|(0o[0-7]*\.?[0-7]+)|(0x[0-9a-fA-F]*\.?[0-9a-fA-F]+))i?";
 
@@ -14,44 +14,55 @@ pub fn matches_regex(regex: &str, token: &str) -> bool {
   return Regex::is_match(&Regex::new(regex).unwrap(), &token);
 }
 
-enum TokenType {
-  Identifier,
-  DecimalNum,
-  Number,
-  String,
-  GroupOpen,
-  GroupClose,
-  Symbol,
-  Whitespace,
+#[derive(Debug)]
+pub enum TokenType {
+  Group(Vec<Token>),
+  Identifier(String),
+  DecimalNum(String),
+  Number(String),
+  String(String),
+  GroupOpen(String),
+  GroupClose(String),
+  Symbol(String),
+  Whitespace(String),
   LineFeed,
   Comment
 }
 
-struct Token {
-  token: TokenType,
-  string: String
+#[derive(Debug)]
+pub struct Token {
+  pub token: TokenType,
+  length: usize
 }
 
-fn token_type(token: &str) -> TokenType {
+fn create_token(token: &str) -> Token {
+  let token_type: TokenType;
   if token == "\n" {
-    return TokenType::LineFeed;
+    token_type = TokenType::LineFeed;
   } else if token.starts_with("#") {
-    return TokenType::Comment;
+    token_type = TokenType::Comment;
   } else if "([{".contains(&token) {
-    return TokenType::GroupOpen;
+    token_type = TokenType::GroupOpen(token.to_string());
   } else if ")]}".contains(&token) {
-    return TokenType::GroupClose;
+    token_type = TokenType::GroupClose(token.to_string());
   } else if token.trim().is_empty() {
-    return TokenType::Whitespace;
+    token_type = TokenType::Whitespace(token.to_string());
   } else if matches_regex(STRING_REGEX, &token) {
-    return TokenType::String;
+    token_type = TokenType::String(token.to_string());
   } else if matches_regex(DEC_REGEX, &token) {
-    return TokenType::DecimalNum;
+    token_type = TokenType::DecimalNum(token.to_string());
   } else if matches_regex(NUM_REGEX, &token) {
-    return TokenType::Number;
+    token_type = TokenType::Number(token.to_string());
   } else if matches_regex(SYMBOL_REGEX, &token) {
-    return TokenType::Symbol;
-  } return TokenType::Identifier;
+    token_type = TokenType::Symbol(token.to_string());
+  } else {
+    token_type = TokenType::Identifier(token.to_string());
+  }
+
+  return Token {
+    token: token_type,
+    length: token.len()
+  };
 }
 
 struct Block {
@@ -62,18 +73,43 @@ struct Block {
 
 // TODO someday: add support for nested formatted strings
 // (Python didn't add this until ver 3.12 lol)
-pub fn get_next(code: &str) -> Token {
-  let token_regex: Regex = Regex::new(&format!("^({})|({})|({})|({})|({})|({})|({})", COMMENT_REGEX, SPACE_REGEX, DEC_REGEX, NUM_REGEX, STRING_REGEX, SYMBOL_REGEX, IDENTIFIER_REGEX)).unwrap();
+fn get_next(code: &str) -> Token {
+  let token_regex: Regex = Regex::new(&format!(r"\A({})|({})|({})|({})|({})|({})|({})", COMMENT_REGEX, SPACE_REGEX, DEC_REGEX, NUM_REGEX, STRING_REGEX, SYMBOL_REGEX, IDENTIFIER_REGEX)).unwrap();
 
   let token: Option<Match> = Regex::find(&token_regex, code);
   if !token.is_none() {
     let t: Match = token.unwrap();
-    if t.start() != 0 {
-      let string: &str = &code[..t.end()];
-      return Token {
-        token: token_type(string),
-        string: string.to_string()
-      };
+    let string: &str = &code[..t.end()];
+
+    return create_token(string);
+  } panic!("SyntaxError: invalid token, starting at:\n{}", code);
+}
+
+pub fn lex(mut code: &str) -> Vec<Token> {
+  let mut output: Vec<Token> = Vec::new();
+  while !code.is_empty() {
+    let current: Token = get_next(code);
+    code = &code[current.length..];
+    output.push(current);
+  }
+  return output;
+}
+
+
+pub fn match_group(code: &Vec<Token>, mut i: usize) -> usize {
+  let mut balance: usize = 0;
+  
+  while i < code.len() {
+    let current: &Token = &code[i];
+    match current.token {
+      TokenType::GroupOpen(_) => balance += 1,
+      TokenType::GroupClose(_) => balance -= 1,
+      _ => (),
     }
-  } panic!("SyntaxError: invalid token");
+    if balance == 0 {
+      return i;
+    }
+    i += 1;
+  }
+  panic!("SyntaxError: unclosed grouping symbol");
 }
