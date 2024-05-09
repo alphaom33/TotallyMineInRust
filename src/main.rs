@@ -11,6 +11,7 @@ use std::slice::Iter;
 //mod post_processor;
 //#[cfg(test)]
 //mod tests;
+use lexer::TokenType;
 
 mod lexer;
 
@@ -19,7 +20,7 @@ fn main() {
   let code: &str = &read_file(path);
   for i in lexer::lex(&code) {
     match i.token {
-      lexer::TokenType::Identifier(k) | lexer::TokenType::DecimalNum(k) | lexer::TokenType::Number(k) | lexer::TokenType::String(k) | lexer::TokenType::GroupOpen(k) | lexer::TokenType::GroupClose(k) | lexer::TokenType::Symbol(k) | lexer::TokenType::Whitespace(k) => println!("{}", k),
+      TokenType::Identifier(k) | TokenType::DecimalNum(k) | TokenType::Number(k) | TokenType::String(k) | TokenType::GroupOpen(k) | TokenType::GroupClose(k) | TokenType::Symbol(k) | TokenType::Whitespace(k) => println!("{}", k),
       _ => ()
     }
   }

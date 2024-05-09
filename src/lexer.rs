@@ -15,9 +15,7 @@ pub fn matches_regex(regex: &str, token: &str) -> bool {
 }
 
 pub enum TokenType {
-  ParenGroup(Vec<Token>),
-  BracketGroup(Vec<Token>),
-  BraceGroup(Vec<Token>),
+  Group(Vec<Token>),
   Identifier(String),
   DecimalNum(String),
   Number(String),
@@ -96,8 +94,7 @@ pub fn lex(mut code: &str) -> Vec<Token> {
 }
 
 
-pub fn match_group(code: Vec<Token>) -> usize {
-  let mut i: usize = 0;
+pub fn match_group(code: &Vec<Token>, mut i: usize) -> usize {
   let mut balance: usize = 0;
   
   while i < code.len() {
@@ -110,4 +107,28 @@ pub fn match_group(code: Vec<Token>) -> usize {
     i += 1;
   }
   return balance;
+}
+
+pub fn group_groups(code: Vec<Token>) -> Vec<Token> {
+  let mut output: Vec<Token> = Vec::new();
+  let mut i: usize = 0;
+
+  while i < code.len() {
+    let current: Token = code[i];
+    match current.token {
+      TokenType::GroupOpen(_) => {
+        let length: usize = match_group(&code, i);
+        while i < length {
+          output.push(code[i]);
+          i += 1;
+        }
+      },
+      _ => {
+        output.push(current);
+        i += 1;
+      }
+    }
+  }
+
+  return output;
 }
