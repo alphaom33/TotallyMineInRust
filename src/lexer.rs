@@ -14,7 +14,7 @@ pub fn matches_regex(regex: &str, token: &str) -> bool {
   return Regex::is_match(&Regex::new(regex).unwrap(), &token);
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum TokenType {
   Group(Vec<Token>),
   Identifier(String),
@@ -29,10 +29,16 @@ pub enum TokenType {
   Comment
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Token {
   pub token: TokenType,
   length: usize
+}
+
+impl Token {
+  pub fn new(token_type: TokenType, len: usize) -> Token {
+    Token {token: token_type, length: len}
+  }
 }
 
 fn create_token(token: &str) -> Token {

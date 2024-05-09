@@ -1,12 +1,11 @@
-use crate::tokenizer::{lex, TokenType};
+use crate::lexer::{lex, Token, TokenType};
 use crate::post_processor::post_process;
 use crate::read_file;
 
 #[test]
 fn lex_test() {
     let path: &str = "test/lex.dym";
-    let mut tokens: Vec<TokenType> = lex(&read_file(path));
-    tokens.retain(|x: &TokenType| x != &TokenType::None);
+    let mut tokens: Vec<Token> = lex(&read_file(path));
     assert_eq!(
         tokens,
         [

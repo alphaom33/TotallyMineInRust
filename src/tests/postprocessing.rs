@@ -1,16 +1,15 @@
-use crate::{tokenizer::{lex, TokenType}, post_processor::post_process, read_file};
-
+use crate::{lexer::{lex, Token, TokenType}, post_processor::post_process, read_file};
 
 #[test]
 fn post_process_test() {
     let path: &str = "test/postprocess.dym";
-    let lexed: &mut Vec<TokenType> = &mut lex(&read_file(path));
+    let lexed: &mut Vec<Token> = &mut lex(&read_file(path));
     post_process(lexed);
     assert_eq!(
         *lexed,
         [
-            TokenType::Name(String::from("foo")),
-            TokenType::Set,
+            TokenType::Identifier(String::from("foo")),
+            TokenType::Symbol(String::from("=")),
             TokenType::LeftFuncParenthesis,
             TokenType::RightFuncParenthesis,
             TokenType::Lambda,
