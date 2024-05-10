@@ -6,7 +6,7 @@ static IDENTIFIER_REGEX: &str = "[^\\d\\s+\\-*/\\^%=><\\\\&|~;:,.!?'\"`$@()\\[\\
 static COMMENT_REGEX: &str = "(##(#?[^#])*##)|(#[^\n]*\n)";
 static SPACE_REGEX: &str = "([\\s^\n]|\n)+";
 static STRING_REGEX: &str = "`[^`]*`|\\'(\\\\.|[^\\\\'])*\\'|\\\"(\\\\.|[^\\\\\"])*\\\"";
-static SYMBOL_REGEX: &str = r"->|<?\.\.<?|[?+\-:]{2}|([+\-*/%&|\^?!><]|[/*><]{2})=?|[$@=;:,.~()\[\]{}]";
+static SYMBOL_REGEX: &str = r"->|<?\.\.<?|\?\?|\+\+|--|::|([+\-*/%&|\^?!><]|//|\*\*|>>|<<)=?|[$@=;:,.~()\[\]{}]";
 static DEC_REGEX: &str = r"(\d+(_(\d+))*)?\.?(\d+(_(\d+))*)+i?(e|E(\+|-)?\d+)?";
 static NUM_REGEX: &str = r"((0b[01]*\.?[01]+)|(0o[0-7]*\.?[0-7]+)|(0x[0-9a-fA-F]*\.?[0-9a-fA-F]+))i?";
 
@@ -15,7 +15,6 @@ pub fn matches_regex(regex: &str, token: &str) -> bool {
 }
 
 pub enum TokenType {
-  Group(Vec<Token>),
   Identifier(String),
   DecimalNum(String),
   Number(String),
@@ -30,7 +29,7 @@ pub enum TokenType {
 
 pub struct Token {
   pub token: TokenType,
-  length: usize
+  pub length: usize
 }
 
 fn create_token(token: &str) -> Token {
@@ -94,7 +93,7 @@ pub fn lex(mut code: &str) -> Vec<Token> {
 }
 
 
-pub fn match_group(code: &Vec<Token>, mut i: usize) -> usize {
+pub fn match_group(code: &[Token], mut i: usize) -> usize {
   let mut balance: usize = 0;
   
   while i < code.len() {
@@ -104,31 +103,10 @@ pub fn match_group(code: &Vec<Token>, mut i: usize) -> usize {
       TokenType::GroupClose(_) => balance -= 1,
       _ => (),
     }
+    if balance == 0 {
+      return i;
+    }
     i += 1;
   }
-  return balance;
-}
-
-pub fn group_groups(code: Vec<Token>) -> Vec<Token> {
-  let mut output: Vec<Token> = Vec::new();
-  let mut i: usize = 0;
-
-  while i < code.len() {
-    let current: Token = code[i];
-    match current.token {
-      TokenType::GroupOpen(_) => {
-        let length: usize = match_group(&code, i);
-        while i < length {
-          output.push(code[i]);
-          i += 1;
-        }
-      },
-      _ => {
-        output.push(current);
-        i += 1;
-      }
-    }
-  }
-
-  return output;
+  panic!("SyntaxError: unclosed grouping symbol");
 }
