@@ -158,7 +158,7 @@ fn curly_add(tokens: &mut Vec<Token>, i: usize) {
 }
 
 fn check_fun_tabs(num_tabs: usize, tokens: &mut Vec<Token>, start_dex: usize) {
-    let mut cur_tabs: usize = 10000;
+    let mut cur_tabs: usize;
     let mut token_iter: Skip<Enumerate<Iter<Token>>> = tokens.iter().enumerate().skip(start_dex);
     let mut index: usize = 0;
     
@@ -181,7 +181,7 @@ fn check_fun_tabs(num_tabs: usize, tokens: &mut Vec<Token>, start_dex: usize) {
         }
     }
     tokens[start_dex].token = TokenType::GroupOpen(String::from("{"));
-    let a: usize = advance_to(index - 1, tokens, TokenType::LineFeed, -1);
+
     let dex: usize = advance_to(index, tokens, TokenType::LineFeed, -1) + 1;
     tokens.insert(dex, Token::new(TokenType::GroupClose(String::from("}")), 1));
     tokens.insert(dex + 1, Token::new(TokenType::LineFeed, 1));

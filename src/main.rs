@@ -2,7 +2,6 @@ use std::io::Read;
 use std::fs::File;
 use std::iter::Peekable;
 use std::slice::Iter;
-use std::str::Chars;
 
 use post_processor::post_process;
 
