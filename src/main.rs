@@ -19,7 +19,7 @@ fn main() {
     code += "\n";
   }
 
-  if !code.contains('\t') {
+  if !code.contains('\t') && code.contains("\n ") {
     code = spaces_to_tabs(&mut code);
   }
   let mut tokens: Vec<lexer::Token> = lexer::lex(&code);
