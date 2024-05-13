@@ -5,11 +5,13 @@ use crate::lexer::{TokenType, Token};
 pub fn post_process(tokens: &mut Vec<Token>) {
 
     change_python(tokens);
-    tokens.retain(|x: &Token| TokenType::Whitespace(String::from("\t")) != x.token);
+    tokens.retain(|x: &Token| match x.token {
+        TokenType::Whitespace(_) => false,
+        _ => true,
+    });
 
     scan_curlies(tokens);
     scan_sets(tokens);
-    scan_lambda_curlies(tokens);
     scan_classify_parens(tokens);
 }
 
@@ -72,17 +74,6 @@ fn scan_sets(tokens: &mut Vec<Token>) {
     }
 }
 
-fn scan_lambda_curlies(tokens: &mut Vec<Token>) {
-    for i in 0..tokens.len() {
-        match &tokens[i].token {
-            TokenType::Symbol(s) if s == "->" && tokens[i + 1].token != TokenType::GroupOpen(String::from("{")) => {
-                curly_add(tokens, i)
-            }
-            _ => (),
-        }
-    }
-}
-
 fn scan_classify_parens(tokens: &mut Vec<Token>) {
     for i in 0..tokens.len() {
         match &tokens[i].token {
@@ -136,25 +127,6 @@ fn paren_classify(tokens: &mut Vec<Token>, i: usize) {
 
     // tokens[i] = to_add.0;
     // tokens[j] = to_add.1;
-}
-
-fn curly_add(tokens: &mut Vec<Token>, i: usize) {
-    let mut j: usize = i + 1;
-    let mut count: i32 = 1;
-    while j < tokens.len()
-        && ![TokenType::Symbol(String::from(",")), TokenType::LineFeed].contains(&tokens[j].token)
-        && count > 0
-    {
-        match &tokens[j].token {
-            TokenType::GroupOpen(g) if g == "(" => count += 1,
-            TokenType::GroupClose(g) if g == ")" => count += 1,
-            _ => (),
-        }
-        j += 1;
-    }
-
-    tokens.insert(i + 1, Token::new(TokenType::GroupOpen(String::from("{")), 1));
-    tokens.insert(j, Token::new(TokenType::GroupClose(String::from("}")), 1));
 }
 
 fn check_fun_tabs(num_tabs: usize, tokens: &mut Vec<Token>, start_dex: usize) {

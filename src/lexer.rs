@@ -1,3 +1,6 @@
+use std::fmt::Debug;
+use std::fmt::Error;
+use std::fmt::Formatter;
 use std::vec::Vec;
 use regex::Regex;
 use regex::Match;

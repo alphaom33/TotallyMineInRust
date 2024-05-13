@@ -1,11 +1,10 @@
 use crate::lexer::{lex, Token, TokenType};
-use crate::post_processor::post_process;
 use crate::read_file;
 
 #[test]
 fn lex_test() {
     let path: &str = "test/lex.dym";
-    let mut tokens: Vec<Token> = lex(&read_file(path));
+    let tokens: Vec<Token> = lex(&read_file(path));
     assert_eq!(
         tokens.iter().map(|x: &Token| &x.token).filter(|x| return match x {
             TokenType::Whitespace(_) => false,
