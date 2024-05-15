@@ -15,15 +15,9 @@ mod types;
 fn main() {
     unsafe {
         run(Vec::from([
-            TokenType::Identifier(String::from("varfriend")),
+            TokenType::Identifier(String::from("sad")),
             TokenType::Symbol(String::from("=")),
-            TokenType::Number(String::from("9")),
-            TokenType::LineFeed,
-            TokenType::Identifier(String::from("varname")),
-            TokenType::Symbol(String::from("=")),
-            TokenType::Identifier(String::from("varfriend")),
-            TokenType::Symbol(String::from("+")),
-            TokenType::Number(String::from("8")),
+            TokenType::String(String::from("7")),
         ]));
     }
 }
