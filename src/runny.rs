@@ -90,11 +90,17 @@ unsafe fn eval_numbers(thingy: Vec<TokenType>) -> BaseValue {
 
     while let Some(t) = thingy_iter.next() {
         match t {
-            TokenType::Symbol(s) if s == "+" => {
+            TokenType::Symbol(s) => {
                 if let TokenType::Value(BaseValue::Number(Num::Float(f))) =
                     thingy_iter.next().unwrap()
                 {
-                    sum += f;
+                    match s.as_str() {
+                        "+" => sum += f,
+                        "-" => sum -= f,
+                        "*" => sum *= f,
+                        "/" => sum /= f,
+                        _ => (),
+                    }
                 }
             }
             _ => panic!(),
@@ -133,7 +139,9 @@ unsafe fn typeify(expression: &mut Vec<&TokenType>) -> Vec<TokenType> {
             TokenType::Number(n) => {
                 TokenType::Value(BaseValue::Number(Num::Float(n.parse::<f64>().unwrap())))
             }
-            TokenType::Symbol(s) if ["+"].contains(&s.as_str()) => TokenType::Symbol(s.to_string()),
+            TokenType::Symbol(s) if ["+", "-", "/", "*"].contains(&s.as_str()) => {
+                TokenType::Symbol(s.to_string())
+            }
             TokenType::String(s) => TokenType::Value(BaseValue::String(s.to_string())),
             _ => TokenType::Comment,
         });

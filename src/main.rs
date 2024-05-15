@@ -17,7 +17,9 @@ fn main() {
         run(Vec::from([
             TokenType::Identifier(String::from("sad")),
             TokenType::Symbol(String::from("=")),
-            TokenType::String(String::from("7")),
+            TokenType::Number(String::from("7")),
+            TokenType::Symbol(String::from("/")),
+            TokenType::Number(String::from("4")),
         ]));
     }
 }
