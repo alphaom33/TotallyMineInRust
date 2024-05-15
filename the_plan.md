@@ -9,10 +9,11 @@ Some things that need to be done:
   Preprocessing (M)
 
 Plans for preprocessing:
-  Remove comments
-  Change indented blocks to a set of braces
-  Change foo(){} to foo=(){}
-  Change `foo()=bar` to `foo=()->bar`
-  Change binary/octal/hex numbers to decimal (possibly)
-  Change 9+10 to 21
-  Evaluate number/string literals?
+  - [x] Remove comments
+  - [x] Change indented blocks to a set of braces
+  - [x] Change `foo(){}` to `foo=()->{}`
+  - [ ] Change `foo()=bar` to `foo=()->bar`
+  - [ ] Change binary/octal/hex numbers to decimal (possibly)
+  - [ ] Change `9+10` to `21`
+  - [ ] Evaluate number/string literals?
+  - [ ] Change `foo+=bar` to `foo = foo + (bar)`
