@@ -1,19 +1,14 @@
 use std::{
-    borrow::Borrow,
     collections::HashMap,
-    iter::{Map, Peekable},
-    mem::transmute,
-    os::raw::c_void,
-    ptr::{self, null, null_mut},
-    rc::Rc,
+    iter::Peekable,
     slice::Iter,
 };
 
 use once_cell::sync::Lazy;
 
-use crate::types::BaseValue;
 use crate::{
-    lexer::{Token, TokenType},
+    types::BaseValue,
+    lexer::TokenType,
     types::Num,
 };
 
