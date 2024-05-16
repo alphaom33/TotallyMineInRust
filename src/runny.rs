@@ -1,16 +1,8 @@
-use std::{
-    collections::HashMap,
-    iter::Peekable,
-    slice::Iter,
-};
+use std::{collections::HashMap, iter::{Enumerate, Peekable}, slice::Iter};
 
 use once_cell::sync::Lazy;
 
-use crate::{
-    types::BaseValue,
-    lexer::TokenType,
-    types::Num,
-};
+use crate::{lexer::TokenType, types::BaseValue, types::Num};
 
 static mut VARS: Lazy<HashMap<String, BaseValue>> = Lazy::new(HashMap::new);
 
@@ -76,33 +68,51 @@ unsafe fn eval_strings(thingy: Vec<TokenType>) -> BaseValue {
 }
 
 unsafe fn eval_numbers(thingy: Vec<TokenType>) -> BaseValue {
-    let mut thingy_iter: Peekable<Iter<TokenType>> = thingy.iter().peekable();
-    let mut sum: f64 = if let TokenType::Value(BaseValue::Number(n)) = thingy_iter.next().unwrap() {
+    let mut thingy_iter: Peekable<Enumerate<Iter<TokenType>>> = thingy.iter().enumerate().peekable();
+    let mut sum: f64 = if let TokenType::Value(BaseValue::Number(n)) = thingy_iter.next().unwrap().1 {
         num_bool(n)
     } else {
         0.0f64
     };
 
     while let Some(t) = thingy_iter.next() {
-        match t {
+        match t.1 {
             TokenType::Symbol(s) => {
                 if let TokenType::Value(BaseValue::Number(Num::Float(f))) =
-                    thingy_iter.next().unwrap()
+                    thingy_iter.next().unwrap().1
                 {
-                    match s.as_str() {
-                        "+" => sum += f,
-                        "-" => sum -= f,
-                        "*" => sum *= f,
-                        "/" => sum /= f,
-                        _ => (),
+                    match_operands(&mut sum, s, *f);
+                } else {
+                    let start: usize = thingy_iter.peek().unwrap().0;
+                    while *thingy_iter.peek().unwrap().1 != TokenType::GroupClose(String::from(")")) {
+                        thingy_iter.next();
                     }
+                    let vecy = thingy[start..thingy_iter.peek().unwrap().0].to_vec();
+                    println!("{:?}", vecy);
+                    if let BaseValue::Number(Num::Float(f)) = eval_numbers(vecy) {
+                        match_operands(&mut sum, s, f);
+                    }
+                    thingy_iter.next();
                 }
             }
-            _ => panic!(),
+            _ => {
+                println!("{:?}, {:?}", thingy, t.1);
+                panic!()
+            },
         }
     }
 
     BaseValue::Number(Num::Float(sum))
+}
+
+fn match_operands(sum: &mut f64, s: &String, f: f64) {
+    match s.as_str() {
+        "+" => *sum += f,
+        "-" => *sum -= f,
+        "*" => *sum *= f,
+        "/" => *sum /= f,
+        _ => (),
+    }
 }
 
 fn num_bool(num: &Num) -> f64 {
@@ -134,9 +144,11 @@ unsafe fn typeify(expression: &mut Vec<&TokenType>) -> Vec<TokenType> {
             TokenType::Number(n) => {
                 TokenType::Value(BaseValue::Number(Num::Float(n.parse::<f64>().unwrap())))
             }
-            TokenType::Symbol(s) if ["+", "-", "/", "*"].contains(&s.as_str()) => {
+            TokenType::Symbol(s) if "+-/*".contains(&s.as_str()) => {
                 TokenType::Symbol(s.to_string())
             }
+            TokenType::GroupOpen(s) if "(" == s.as_str() => TokenType::GroupOpen(String::from("(")),
+            TokenType::GroupClose(s) if ")" == s.as_str() => TokenType::GroupClose(String::from(")")),
             TokenType::String(s) => TokenType::Value(BaseValue::String(s.to_string())),
             _ => TokenType::Comment,
         });

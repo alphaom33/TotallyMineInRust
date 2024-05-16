@@ -17,9 +17,17 @@ fn main() {
         run(Vec::from([
             TokenType::Identifier(String::from("sad")),
             TokenType::Symbol(String::from("=")),
+            TokenType::Number(String::from("3")),
+            TokenType::Symbol(String::from("+")),
+            TokenType::GroupOpen(String::from("(")),
             TokenType::Number(String::from("7")),
-            TokenType::Symbol(String::from("/")),
+            TokenType::Symbol(String::from("*")),
             TokenType::Number(String::from("4")),
+            TokenType::GroupClose(String::from(")")),
+            TokenType::LineFeed,
+            TokenType::LineFeed,
+            TokenType::LineFeed,
+            TokenType::LineFeed,
         ]));
     }
 }

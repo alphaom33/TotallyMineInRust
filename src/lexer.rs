@@ -16,7 +16,7 @@ pub fn matches_regex(regex: &str, token: &str) -> bool {
   return Regex::is_match(&Regex::new(regex).unwrap(), &token);
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum TokenType {
   Group(Vec<Token>),
   Identifier(String),
@@ -48,7 +48,7 @@ impl TokenType {
   }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Token {
   pub token: TokenType,
   length: usize
