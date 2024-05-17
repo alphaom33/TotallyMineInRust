@@ -1,15 +1,45 @@
-use std::{collections::HashMap, iter::{Enumerate, Peekable}, slice::Iter};
+use std::{
+    collections::HashMap,
+    iter::{Enumerate, Peekable},
+    slice::Iter,
+};
 
 use once_cell::sync::Lazy;
 
 use crate::{lexer::TokenType, types::BaseValue, types::Num};
 
-static mut VARS: Lazy<HashMap<String, BaseValue>> = Lazy::new(HashMap::new);
+struct VarClosure<'a> {
+    vars: HashMap<String, BaseValue>,
+    parent: &'a Option<&'a VarClosure<'a>>,
+}
+impl<'a> VarClosure<'a> {
+    pub fn new(parent: &'a Option<&'a VarClosure>) -> VarClosure<'a> {
+        VarClosure {
+            vars: HashMap::new(),
+            parent: &parent,
+        }
+    }
+}
 
 pub unsafe fn run(tokens: Vec<TokenType>) {
+    let mut top_closure: VarClosure = VarClosure::new(&None);
+
     let mut token_iter: Peekable<Iter<TokenType>> = tokens.iter().peekable();
+    sad(&mut token_iter, &mut top_closure);
+}
+
+unsafe fn sad(token_iter: &mut Peekable<Iter<TokenType>>, current_closure: &mut VarClosure) {
     while let Some(c) = token_iter.next() {
+        if c == &TokenType::GroupClose(String::from("}")) {
+            break;
+        }
+
         match c {
+            TokenType::GroupOpen(g) if g == "{" => {
+                let oh: &Option<&VarClosure> = &Some(current_closure);
+                let mut new_closure: VarClosure = VarClosure::new(oh);
+                sad(token_iter, &mut new_closure);
+            }
             TokenType::Identifier(i) => match i {
                 _ => {
                     if *token_iter.peek().unwrap() == &TokenType::Symbol(String::from("=")) {
@@ -20,7 +50,10 @@ pub unsafe fn run(tokens: Vec<TokenType>) {
                         {
                             to_evaluate.push(token_iter.next().unwrap());
                         }
-                        VARS.insert(i.to_string(), eval_expression(&mut to_evaluate));
+                        current_closure.vars.insert(
+                            i.to_string(),
+                            eval_expression(&mut to_evaluate, current_closure),
+                        );
                     } else {
                         //call function?
                     }
@@ -29,11 +62,14 @@ pub unsafe fn run(tokens: Vec<TokenType>) {
             _ => (),
         }
     }
-    println!("{:?}", VARS);
+    println!("{:?}", current_closure.vars);
 }
 
-unsafe fn eval_expression(expression: &mut Vec<&TokenType>) -> BaseValue {
-    let get_bases: Vec<TokenType> = typeify(expression);
+unsafe fn eval_expression(
+    expression: &mut Vec<&TokenType>,
+    current_closure: &VarClosure,
+) -> BaseValue {
+    let get_bases: Vec<TokenType> = typeify(expression, current_closure);
     if contains(&get_bases, BaseValue::String(String::new())) {
         eval_strings(get_bases)
     } else if contains(&get_bases, BaseValue::Number(Num::Float(0.0f64))) {
@@ -68,8 +104,10 @@ unsafe fn eval_strings(thingy: Vec<TokenType>) -> BaseValue {
 }
 
 unsafe fn eval_numbers(thingy: Vec<TokenType>) -> BaseValue {
-    let mut thingy_iter: Peekable<Enumerate<Iter<TokenType>>> = thingy.iter().enumerate().peekable();
-    let mut sum: f64 = if let TokenType::Value(BaseValue::Number(n)) = thingy_iter.next().unwrap().1 {
+    let mut thingy_iter: Peekable<Enumerate<Iter<TokenType>>> =
+        thingy.iter().enumerate().peekable();
+    let mut sum: f64 = if let TokenType::Value(BaseValue::Number(n)) = thingy_iter.next().unwrap().1
+    {
         num_bool(n)
     } else {
         0.0f64
@@ -84,11 +122,11 @@ unsafe fn eval_numbers(thingy: Vec<TokenType>) -> BaseValue {
                     match_operands(&mut sum, s, *f);
                 } else {
                     let start: usize = thingy_iter.peek().unwrap().0;
-                    while *thingy_iter.peek().unwrap().1 != TokenType::GroupClose(String::from(")")) {
+                    while *thingy_iter.peek().unwrap().1 != TokenType::GroupClose(String::from(")"))
+                    {
                         thingy_iter.next();
                     }
                     let vecy = thingy[start..thingy_iter.peek().unwrap().0].to_vec();
-                    println!("{:?}", vecy);
                     if let BaseValue::Number(Num::Float(f)) = eval_numbers(vecy) {
                         match_operands(&mut sum, s, f);
                     }
@@ -98,7 +136,7 @@ unsafe fn eval_numbers(thingy: Vec<TokenType>) -> BaseValue {
             _ => {
                 println!("{:?}, {:?}", thingy, t.1);
                 panic!()
-            },
+            }
         }
     }
 
@@ -129,16 +167,23 @@ fn num_bool(num: &Num) -> f64 {
     }
 }
 
-unsafe fn typeify(expression: &mut Vec<&TokenType>) -> Vec<TokenType> {
+unsafe fn typeify(
+    expression: &mut Vec<&TokenType>,
+    current_closure: &VarClosure,
+) -> Vec<TokenType> {
     let mut i: usize = 0;
     let mut get_bases: Vec<TokenType> = Vec::new();
     while i < expression.len() {
         get_bases.push(match &expression[i] {
             TokenType::Identifier(idy) => {
-                if expression[i + 1] == &TokenType::GroupOpen(String::from("(")) {
+                if expression.len() > 1 && expression[i + 1] == &TokenType::GroupOpen(String::from("(")) {
                     call_function(expression, &mut i)
                 } else {
-                    TokenType::Value(VARS.get(idy).unwrap().clone())
+                    let mut tmp_closure = current_closure;
+                    while tmp_closure.vars.get(idy).is_none() {
+                        tmp_closure = tmp_closure.parent.unwrap();
+                    };
+                    TokenType::Value(tmp_closure.vars.get(idy).unwrap().clone())
                 }
             }
             TokenType::Number(n) => {
@@ -148,7 +193,9 @@ unsafe fn typeify(expression: &mut Vec<&TokenType>) -> Vec<TokenType> {
                 TokenType::Symbol(s.to_string())
             }
             TokenType::GroupOpen(s) if "(" == s.as_str() => TokenType::GroupOpen(String::from("(")),
-            TokenType::GroupClose(s) if ")" == s.as_str() => TokenType::GroupClose(String::from(")")),
+            TokenType::GroupClose(s) if ")" == s.as_str() => {
+                TokenType::GroupClose(String::from(")"))
+            }
             TokenType::String(s) => TokenType::Value(BaseValue::String(s.to_string())),
             _ => TokenType::Comment,
         });
