@@ -2,6 +2,8 @@ use std::vec::Vec;
 use regex::Regex;
 use regex::Match;
 
+use crate::types::BaseValue;
+
 static IDENTIFIER_REGEX: &str = "[^\\d\\s+\\-*/\\^%=><\\\\&|~;:,.!?'\"`$@()\\[\\]{}#][^\\s+\\-*/\\^%=><\\\\&|~;:,.!?'\"`$@()\\[\\]{}#]*";
 static COMMENT_REGEX: &str = "(##(#?[^#])*##)|(#[^\n]*\n)";
 static SPACE_REGEX: &str = "([\\s^\n]|\n)+";
@@ -14,7 +16,7 @@ pub fn matches_regex(regex: &str, token: &str) -> bool {
   return Regex::is_match(&Regex::new(regex).unwrap(), &token);
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum TokenType {
   Group(Vec<Token>),
   Identifier(String),
@@ -25,11 +27,28 @@ pub enum TokenType {
   GroupClose(String),
   Symbol(String),
   Whitespace(String),
+  Value(BaseValue),
   LineFeed,
   Comment
 }
 
-#[derive(Debug)]
+impl TokenType {
+  pub fn get_self(&self) -> Option<String> {
+    match self {
+        TokenType::Identifier(g) => Some(g.to_string()),
+        TokenType::DecimalNum(g) => Some(g.to_string()),
+        TokenType::Number(g) => Some(g.to_string()),
+        TokenType::String(g) => Some(g.to_string()),
+        TokenType::GroupOpen(g) => Some(g.to_string()),
+        TokenType::GroupClose(g) => Some(g.to_string()),
+        TokenType::Symbol(g) => Some(g.to_string()),
+        TokenType::Whitespace(g) => Some(g.to_string()),
+        _ => None,
+    }
+  }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct Token {
   pub token: TokenType,
   length: usize
